@@ -1,0 +1,769 @@
+/* =========================================================
+   SportsHub – tema "stadio di sera" sopra Bootstrap 5 (dark)
+   ========================================================= */
+
+:root {
+  --sh-bg: #0b1120;
+  --sh-surface: #141c2e;
+  --sh-surface-2: #1d2740;
+  --sh-border: rgba(255, 255, 255, 0.08);
+  --sh-text: #e8ecf4;
+  --sh-muted: #8b97ad;
+  --sh-accent: #22c55e;       /* verde campo */
+  --sh-accent-dark: #16a34a;
+  --sh-star: #facc15;
+  --sh-led: #fde047;          /* cifre del tabellone */
+
+  /* colori per sport */
+  --sport-soccer: #22c55e;
+  --sport-basket: #f97316;
+  --sport-football: #d30808;
+  --sport-rugby: #8b5cf6;
+  --sport-other: #64748b;
+
+  --font-board: "Bebas Neue", "Oswald", Impact, sans-serif;
+
+  /* sovrascrivo le variabili di Bootstrap per il tema scuro */
+  --bs-body-bg: var(--sh-bg);
+  --bs-body-color: var(--sh-text);
+  --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: var(--sh-bg);
+  --bs-body-color: var(--sh-text);
+}
+
+/* scorrimento morbido per i link #preferiti e #top */
+html {
+  scroll-behavior: smooth;
+}
+
+/* le sezioni non finiscono attaccate al bordo quando ci si arriva con un link */
+section[id] {
+  scroll-margin-top: 1.5rem;
+}
+
+body {
+  background-color: var(--sh-bg);
+  color: var(--sh-text);
+  font-family: var(--bs-body-font-family);
+}
+
+.main-wrap {
+  max-width: 1100px;
+}
+
+/* ---------- Bottone accento ---------- */
+.btn-accent {
+  background-color: var(--sh-accent);
+  border-color: var(--sh-accent);
+  color: #06210f;
+  font-weight: 700;
+}
+
+.btn-accent:hover,
+.btn-accent:focus-visible {
+  background-color: var(--sh-accent-dark);
+  border-color: var(--sh-accent-dark);
+  color: #fff;
+}
+
+/* =========================================================
+   HEADER – luci dello stadio + strisce del campo
+   Per usare una foto vera sostituisci l'ultimo livello con:
+   url("img/stadio.jpg") center / cover no-repeat;
+   ========================================================= */
+.hero {
+  position: relative;
+  padding: 4.5rem 0 3.5rem;
+  background:
+    radial-gradient(ellipse 35% 60% at 12% -10%, rgba(255, 255, 255, 0.45), transparent 70%),
+    radial-gradient(ellipse 35% 60% at 88% -10%, rgba(255, 255, 255, 0.45), transparent 70%),
+    linear-gradient(180deg, rgba(11, 17, 32, 0.35) 0%, rgba(11, 17, 32, 0.75) 60%, var(--sh-bg) 100%),
+    repeating-linear-gradient(90deg, #14532d 0 70px, #166534 70px 140px);
+}
+
+/* mezzo cerchio di centrocampo (non esce dall'header,
+   così il menu dei suggerimenti può sporgere sotto) */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 0;
+  width: 220px;
+  height: 70px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-bottom: none;
+  border-radius: 110px 110px 0 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero .container {
+  z-index: 1;
+}
+
+.hero-title {
+  font-family: var(--font-board);
+  font-size: clamp(3rem, 9vw, 5rem);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: #fff;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(253, 224, 71, 0.35), 0 4px 0 rgba(0, 0, 0, 0.35);
+  margin-bottom: 0.75rem;
+}
+
+.hero-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.search-form {
+  max-width: 560px;
+}
+
+.search-form .form-control {
+  background-color: rgba(11, 17, 32, 0.75);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.search-form .form-control:focus {
+  border-color: var(--sh-accent);
+  box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.25);
+}
+
+/* ---------- Suggerimenti ricerca ---------- */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 340px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.35rem;
+  background-color: var(--sh-surface);
+  border: 1px solid var(--sh-border);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  text-align: left;
+  animation: fadeUp 0.18s ease both;
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.suggestion:hover,
+.suggestion.active {
+  background-color: var(--sh-surface-2);
+}
+
+.suggestion-logo {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  padding: 3px;
+  border-radius: 50%;
+  background: #fff;
+  object-fit: contain;
+}
+
+.suggestion-name {
+  font-weight: 600;
+  color: var(--sh-text);
+}
+
+.suggestion-name mark {
+  padding: 0;
+  background: transparent;
+  color: var(--sh-accent);
+  font-weight: 800;
+}
+
+.suggestion-meta {
+  font-size: 0.8rem;
+  color: var(--sh-muted);
+}
+
+.suggestion-info {
+  padding: 0.6rem 0.65rem;
+  color: var(--sh-muted);
+  font-style: italic;
+}
+
+/* ---------- Titoli e messaggi ---------- */
+.section-title {
+  font-family: var(--font-board);
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+  color: var(--sh-text);
+}
+
+.empty-msg {
+  color: var(--sh-muted);
+  font-style: italic;
+}
+
+/* ---------- Filtro sport ---------- */
+.sport-filter {
+  max-width: 100%;
+  overflow-x: auto; /* se non c'è spazio si scorre in orizzontale */
+}
+
+.btn-filter {
+  white-space: nowrap;
+  background-color: var(--sh-surface);
+  border: 1px solid var(--sh-border);
+  color: var(--sh-muted);
+  font-weight: 600;
+}
+
+.btn-filter:hover {
+  color: var(--sh-text);
+  background-color: var(--sh-surface-2);
+}
+
+.btn-filter.active {
+  background-color: var(--sh-accent);
+  border-color: var(--sh-accent);
+  color: #06210f;
+}
+
+/* =========================================================
+   CARD SQUADRA – striscia sport + logo che esce dal bordo
+   ========================================================= */
+.team-grid {
+  row-gap: 3.75rem !important; /* spazio per il logo che sporge */
+  padding-top: 3rem;
+}
+
+.team-card {
+  --sport-color: var(--sport-other);
+  position: relative;
+  background-color: var(--sh-surface);
+  border: 1px solid var(--sh-border);
+  border-top: 4px solid var(--sport-color);
+  border-radius: 14px;
+  padding: 3.75rem 1rem 1.25rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.team-card[data-sport="Soccer"]            { --sport-color: var(--sport-soccer); }
+.team-card[data-sport="Basketball"]        { --sport-color: var(--sport-basket); }
+.team-card[data-sport="American Football"] { --sport-color: var(--sport-football); }
+.team-card[data-sport="Rugby"]             { --sport-color: var(--sport-rugby); }
+
+.team-card:hover,
+.team-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--sport-color);
+  outline: none;
+}
+
+.team-card.active {
+  box-shadow: 0 0 0 2px var(--sport-color);
+}
+
+.team-logo-wrap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  padding: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), 0 0 0 4px var(--sh-surface);
+  transform: translate(-50%, -55%);
+}
+
+.team-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.team-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--sh-text);
+  margin-bottom: 0.25rem;
+}
+
+.team-meta {
+  color: var(--sh-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.sport-pill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--sport-color);
+  background-color: color-mix(in srgb, var(--sport-color) 15%, transparent);
+}
+
+/* ---------- Stellina preferiti ---------- */
+.btn-star {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--sh-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: transform 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-star:hover {
+  background-color: var(--sh-surface-2);
+  color: var(--sh-star);
+  transform: scale(1.15);
+}
+
+.btn-star.is-fav {
+  color: var(--sh-star);
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+}
+
+/* =========================================================
+   SKELETON LOADING
+   ========================================================= */
+.skeleton {
+  background: linear-gradient(90deg, var(--sh-surface-2) 25%, #2a3654 50%, var(--sh-surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite linear;
+  border-radius: 6px;
+}
+
+.skeleton-card {
+  pointer-events: none;
+  cursor: default;
+}
+
+.skeleton-card .team-logo-wrap {
+  background: var(--sh-surface-2);
+}
+
+.skeleton-line {
+  height: 0.85rem;
+  margin: 0.5rem auto;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* =========================================================
+   ANIMAZIONI
+   ========================================================= */
+.fade-up {
+  animation: fadeUp 0.45s ease both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.4s ease both;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; transform: translateY(0);     clip-path: inset(0 0 0 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .fade-up, .slide-in, .skeleton { animation: none; }
+  .team-card, .btn-star { transition: none; }
+}
+
+/* =========================================================
+   TABELLONE – punteggi e righe partita
+   ========================================================= */
+.scoreboard {
+  display: inline-block;
+  min-width: 4.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  background-color: #000;
+  color: var(--sh-led);
+  font-family: var(--font-board);
+  font-size: 1.5rem;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(253, 224, 71, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 -8px 12px rgba(255, 255, 255, 0.04);
+}
+
+.scoreboard.is-vs {
+  color: var(--sh-muted);
+  text-shadow: none;
+}
+
+.scoreboard.is-time {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+}
+
+.scoreboard-lg {
+  font-size: 2.8rem;
+  min-width: 7rem;
+  padding: 0.3rem 1rem;
+}
+
+.event-row {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 0.5rem;
+  border: none;
+  border-bottom: 1px solid var(--sh-border);
+  background: transparent;
+  color: inherit;
+  text-align: center;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.event-row:hover,
+.event-row:focus-visible {
+  background-color: var(--sh-surface-2);
+  outline: none;
+}
+
+.event-date {
+  color: var(--sh-muted);
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.event-match {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.event-team {
+  font-weight: 600;
+  font-size: 0.95rem;
+  overflow-wrap: break-word;
+}
+
+.event-team.home { text-align: right; }
+.event-team.away { text-align: left; }
+
+.event-empty {
+  color: var(--sh-muted);
+  font-style: italic;
+  padding: 0.85rem 0.5rem;
+}
+
+/* ---------- Pannello dettagli ---------- */
+.details-card {
+  background-color: var(--sh-surface);
+  border: 1px solid var(--sh-border);
+  border-radius: 14px;
+}
+
+.details-title {
+  font-family: var(--font-board);
+  font-size: 2.2rem;
+  letter-spacing: 0.04em;
+  color: var(--sh-text);
+}
+
+.details-subtitle {
+  font-family: var(--font-board);
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--sh-accent);
+  color: var(--sh-text);
+}
+
+/* ---------- Prossima partita in evidenza ---------- */
+.next-match {
+  background:
+    radial-gradient(ellipse at top, rgba(34, 197, 94, 0.18), transparent 70%),
+    var(--sh-surface-2);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  color: inherit;
+}
+
+.next-match:hover {
+  border-color: var(--sh-accent);
+}
+
+.next-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sh-accent);
+}
+
+.countdown-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: var(--sh-accent);
+  color: #06210f;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.countdown-pill.is-past {
+  background-color: var(--sh-surface-2);
+  color: var(--sh-muted);
+}
+
+/* ---------- Appuntamenti ---------- */
+.appointment-card {
+  height: 100%;
+  width: 100%;
+  background-color: var(--sh-surface);
+  border: 1px solid var(--sh-border);
+  border-left: 4px solid var(--sport-color, var(--sh-accent));
+  border-radius: 12px;
+  padding: 1rem;
+  color: inherit;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.appointment-card:hover,
+.appointment-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--sh-accent);
+  outline: none;
+}
+
+.appointment-card .event-date {
+  margin-bottom: 0.25rem;
+}
+
+.appointment-league {
+  color: var(--sh-muted);
+  font-size: 0.8rem;
+}
+
+/* =========================================================
+   MODALE PARTITA
+   ========================================================= */
+.match-modal {
+  background-color: var(--sh-surface);
+  border: 1px solid var(--sh-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.match-modal .modal-header,
+.match-modal .modal-footer {
+  border-color: var(--sh-border);
+}
+
+.match-modal .modal-title {
+  color: var(--sh-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.match-hero {
+  background:
+    radial-gradient(ellipse at top, rgba(253, 224, 71, 0.12), transparent 70%),
+    var(--sh-surface-2);
+  border-radius: 12px;
+  padding: 1.25rem 0.75rem;
+  text-align: center;
+}
+
+.match-teams {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.match-team-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+.match-team-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  overflow-wrap: break-word;
+}
+
+.match-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.match-info dt {
+  color: var(--sh-muted);
+  font-weight: 500;
+}
+
+.match-info dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.match-thumb {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 1rem;
+}
+
+/* ---------- Schermi piccoli ---------- */
+@media (max-width: 575.98px) {
+  .scoreboard-lg {
+    font-size: 1.7rem;
+    min-width: 4.25rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .next-match .event-team {
+    font-size: 0.95rem !important;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .btn-filter {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* =========================================================
+   BOTTONI FISSI – preferiti + torna su
+   ========================================================= */
+.floating-nav {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1030; /* sotto la modale di Bootstrap (1055) */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.floating-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, opacity 0.25s ease, visibility 0.25s ease, background-color 0.2s ease;
+}
+
+.floating-btn:hover,
+.floating-btn:focus-visible {
+  transform: translateY(-3px);
+}
+
+.floating-btn:focus-visible {
+  outline: 3px solid var(--sh-star);
+  outline-offset: 3px;
+}
+
+.floating-fav {
+  background-color: var(--sh-surface-2);
+  border: 1px solid var(--sh-border);
+  color: var(--sh-star);
+}
+
+.floating-fav:hover {
+  background-color: #2a3654;
+}
+
+.floating-top {
+  background-color: var(--sh-accent);
+  color: #06210f;
+}
+
+.floating-top:hover {
+  background-color: var(--sh-accent-dark);
+  color: #fff;
+}
+
+/* nascosto finché si è in cima alla pagina */
+.floating-top.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+
+/* numero di preferite sul bottone ⭐ */
+.fav-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background-color: var(--sh-star);
+  color: #1d1d1f;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.35rem;
+  text-align: center;
+}
+
+@media (max-width: 575.98px) {
+  .floating-nav {
+    right: 0.9rem;
+    bottom: 0.9rem;
+  }
+
+  .floating-btn {
+    width: 2.9rem;
+    height: 2.9rem;
+    font-size: 1.25rem;
+  }
+}

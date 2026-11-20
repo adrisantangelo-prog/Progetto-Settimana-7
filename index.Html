@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SportsHub</title>
+
+  <!-- Font stile "tabellone" -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Stili personalizzati -->
+  <link rel="stylesheet" href="assets/css/style.css">
+<body id="top">
+
+  <!-- ===== HEADER "STADIO" CON RICERCA ===== -->
+  <header class="hero text-center">
+    <div class="container main-wrap position-relative">
+      <h1 class="hero-title">SportsHub</h1>
+      <p class="hero-subtitle mb-4">Cerca una squadra, scopri prossime partite e ultimi risultati.</p>
+
+      <form id="search-form" class="search-form d-flex gap-2 mx-auto" role="search">
+        <label for="search-input" class="visually-hidden">Nome squadra</label>
+        <!-- Input + menu dei suggerimenti -->
+        <div class="search-box position-relative flex-grow-1">
+          <input
+            id="search-input"
+            type="search"
+            class="form-control form-control-lg"
+            placeholder="es. Arsenal, Lakers, Real Madrid..."
+            autocomplete="off"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="suggestions"
+          >
+          <ul id="suggestions" class="suggestions list-unstyled d-none" role="listbox" aria-label="Squadre suggerite"></ul>
+        </div>
+        <button type="submit" class="btn btn-accent btn-lg px-4">Cerca</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="container main-wrap py-5">
+
+    <!-- ===== RISULTATI RICERCA ===== -->
+    <section class="mb-5" aria-labelledby="results-title">
+      <h2 id="results-title" class="section-title mb-3">Squadre trovate</h2>
+
+      <div id="error-box" class="alert alert-danger d-none" role="alert"></div>
+      <p id="results-msg" class="empty-msg">Inizia cercando una squadra qui sopra.</p>
+
+      <div id="results-grid" class="row g-3 team-grid" aria-live="polite"></div>
+
+      <!-- Dettagli della squadra selezionata -->
+      <div id="details" class="mt-4"></div>
+    </section>
+
+    <!-- ===== PREFERITE + FILTRO SPORT ===== -->
+    <section id="preferiti" class="mb-5" aria-labelledby="fav-title">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+        <h2 id="fav-title" class="section-title mb-0">⭐ Le tue squadre preferite</h2>
+
+        <div id="sport-filter" class="sport-filter btn-group" role="group" aria-label="Filtra per sport">
+          <button type="button" class="btn btn-sm btn-filter active" data-sport="all" aria-pressed="true">Tutti</button>
+          <button type="button" class="btn btn-sm btn-filter" data-sport="Soccer" aria-pressed="false">⚽ Calcio</button>
+          <button type="button" class="btn btn-sm btn-filter" data-sport="Basketball" aria-pressed="false">🏀 Basket</button>
+          <button type="button" class="btn btn-sm btn-filter" data-sport="American Football" aria-pressed="false">🏈 Football</button>
+          <button type="button" class="btn btn-sm btn-filter" data-sport="Rugby" aria-pressed="false">🏉 Rugby</button>
+        </div>
+      </div>
+
+      <p id="fav-empty" class="empty-msg mt-3">
+        Non hai ancora salvato nessuna squadra. Cercane una con la barra in alto e tocca la ☆ per aggiungerla ai preferiti.
+      </p>
+      <div id="fav-grid" class="row g-3 team-grid"></div>
+    </section>
+
+    <!-- ===== PROSSIMI APPUNTAMENTI (Promise.allSettled) ===== -->
+    <section id="appointments-section" class="mb-5 d-none" aria-labelledby="appointments-title">
+      <h2 id="appointments-title" class="section-title mb-3">📅 I tuoi prossimi appuntamenti</h2>
+      <div id="appointments-warning" class="alert alert-warning py-2 small d-none" role="status"></div>
+      <div id="appointments" class="row g-3"></div>
+    </section>
+
+  </main>
+
+  <!-- ===== BOTTONI FISSI: preferiti + torna su ===== -->
+  <nav class="floating-nav" aria-label="Navigazione rapida">
+    <a href="#preferiti" class="floating-btn floating-fav" aria-label="Vai alle squadre preferite" title="Vai ai preferiti">
+      ⭐
+      <span id="fav-count" class="fav-count d-none">0</span>
+    </a>
+    <a href="#top" id="back-to-top" class="floating-btn floating-top" aria-label="Torna all'inizio della pagina" title="Torna su">↑</a>
+  </nav>
+
+  <!-- ===== MODALE PARTITA (Bootstrap) ===== -->
+  <div class="modal fade" id="event-modal" tabindex="-1" aria-labelledby="event-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content match-modal">
+        <div class="modal-header">
+          <h2 class="modal-title fs-6" id="event-modal-title">Partita</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+        <div class="modal-body" id="event-modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-light d-none" id="modal-details-btn">Tutti i dettagli della squadra</button>
+          <button type="button" class="btn btn-accent" data-bs-dismiss="modal">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bootstrap JS: serve per la modale -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="assets\js\main.js"></script>
+</body>
+</html>
